@@ -3,12 +3,10 @@ package com.github.kornilova_l.f_secure_test_task;
 import org.apache.commons.validator.UrlValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/messages")
@@ -17,9 +15,18 @@ public class MessageController {
     @Autowired
     private MessageRepository repository;
 
-    @RequestMapping(method = RequestMethod.GET)
-    public List<Message> findAll() {
-        return repository.findAll();
+    /**
+     * Handler for version 1 requests
+     * Messages returned by the first version should contain only title, content and sender fields.
+     * The first version must not accept any other parameters than the version parameter.
+     */
+    @RequestMapping(method = RequestMethod.GET, params = {"version=1"})
+    public List<Message> findAll(@RequestParam Map<String, String> parameters) {
+        if (parameters.size() != 1) { // "must not accept any other parameters than the version parameter"
+            System.err.println("GET request for messages. Version 1. This version does not support any parameters except version. Parameters: " + parameters);
+            return null;
+        }
+        return repository.getSenderTitleAndContent();
     }
 
     @RequestMapping(method = RequestMethod.POST)
