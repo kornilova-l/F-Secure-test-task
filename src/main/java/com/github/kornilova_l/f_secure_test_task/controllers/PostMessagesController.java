@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletResponse;
+
 /**
  * This class is needed to validate url of uploaded messages {@link Message}
  */
@@ -16,10 +18,11 @@ public class PostMessagesController extends AbstractMessagesController {
     private final UrlValidator urlValidator = new UrlValidator();
 
     @RequestMapping(name = name, method = RequestMethod.POST)
-    public Message add(@Validated @RequestBody Message message) {
+    public Message add(@Validated @RequestBody Message message, HttpServletResponse response) {
         if (urlValidator.isValid(message.getUrl())) { // validate url
             return repository.saveAndFlush(message);
         }
+        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         return null;
     }
 }
