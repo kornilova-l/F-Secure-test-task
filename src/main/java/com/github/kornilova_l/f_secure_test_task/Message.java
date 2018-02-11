@@ -18,6 +18,7 @@ public class Message {
     @Id // primary key
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
+
     @NotNull
     @Size(max = 100)
     @JsonView(MessagesV1.class)
