@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Map;
 
@@ -21,9 +22,10 @@ public class MessagesV1 extends AbstractMessagesController {
 
     @RequestMapping(name = name, method = RequestMethod.GET, params = {"version=1"})
     @JsonView(MessagesV1.class) // accepts only 'sender', 'title' and 'content' fields
-    public List<Message> getAll(@RequestParam Map<String, String> parameters) {
+    public List<Message> getAll(@RequestParam Map<String, String> parameters, HttpServletResponse response) {
         if (parameters.size() != 1) { // "must not accept any other parameters than the version parameter"
             System.err.println("GET request for messages. Version 1. This version does not support any parameters except version. Parameters: " + parameters);
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return null;
         }
         return repository.findAll();
